@@ -6,102 +6,114 @@
 <title>Roue du choix</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Figtree:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#FFF4DE; --ink:#1F3A5F; --soft:#5B6F8A; --card:#FFFFFF; --line:#E9D9B8;
-  --accent:#E4572E; --accent-ink:#FFFFFF;
+  --bg:#FDEEF0; --ink:#5A3A2E; --soft:#9A7468; --card:#FFFFFF; --line:#F4D6DB;
+  --crust:#E9B872; --crust-dark:#C98F45; --choco:#5A3A2E; --choco-ink:#FFF6F7;
+  --accent:#E77F95;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);
   padding-bottom:env(safe-area-inset-bottom,0px);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#14263D; --ink:#FFF4DE; --soft:#A9B8CC; --card:#1C3350; --line:#2C4768;
-    --accent:#F2B134; --accent-ink:#14263D;
+    --bg:#2B1D19; --ink:#FCE9EC; --soft:#C9A9A0; --card:#3A2823; --line:#4D3730;
+    --choco:#FCE9EC; --choco-ink:#2B1D19; --accent:#F4A3B4;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#14263D; --ink:#FFF4DE; --soft:#A9B8CC; --card:#1C3350; --line:#2C4768;
-  --accent:#F2B134; --accent-ink:#14263D;
+  --bg:#2B1D19; --ink:#FCE9EC; --soft:#C9A9A0; --card:#3A2823; --line:#4D3730;
+  --choco:#FCE9EC; --choco-ink:#2B1D19; --accent:#F4A3B4;
 }
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *,*::before,*::after{box-sizing:inherit}
 body{
   margin:0; background:var(--bg); color:var(--ink);
-  font-family:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
-  font-size:1rem; line-height:1.5;
+  font-family:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:1rem; line-height:1.55;
 }
-main{max-width:1000px; margin:0 auto; padding:1.5rem 1rem 3rem;}
+main{max-width:1020px; margin:0 auto; padding:1.5rem 1rem 3rem;}
 h1{
-  font-family:"Bagel Fat One","Arial Rounded MT Bold","Trebuchet MS",sans-serif;
-  font-weight:400; font-size:clamp(2.2rem,7vw,3.6rem); line-height:1;
-  margin:.5rem 0 1.5rem; text-align:center; letter-spacing:.01em;
+  font-family:"Fredoka","Arial Rounded MT Bold",system-ui,sans-serif;
+  font-weight:700; font-size:clamp(2.2rem,7vw,3.4rem); line-height:1.05;
+  margin:.5rem 0 .25rem; text-align:center;
 }
+.sub{text-align:center; color:var(--soft); margin:0 0 1.75rem;}
 .layout{display:grid; gap:2rem; grid-template-columns:1fr; align-items:start;}
-@media (min-width:820px){ .layout{grid-template-columns:1.3fr 1fr;} }
+@media (min-width:840px){ .layout{grid-template-columns:1.35fr 1fr;} }
 
-.wheel-wrap{position:relative; width:100%; max-width:520px; margin:0 auto; aspect-ratio:1;}
+.wheel-wrap{position:relative; width:100%; max-width:540px; margin:1.25rem auto 0; aspect-ratio:1;}
 canvas{width:100%; height:100%; display:block;}
 .pointer{
-  position:absolute; top:-6px; left:50%; transform:translateX(-50%);
-  width:0; height:0; border-left:18px solid transparent; border-right:18px solid transparent;
-  border-top:34px solid var(--ink); filter:drop-shadow(0 2px 0 var(--bg)); z-index:2;
+  position:absolute; top:-22px; left:50%; transform:translateX(-50%); z-index:3;
+  width:40px; height:52px;
 }
+.pointer svg{width:100%; height:100%; display:block; filter:drop-shadow(0 3px 2px rgba(90,58,46,.25));}
 .spin{
   position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-  width:26%; aspect-ratio:1; border-radius:50%;
-  border:5px solid var(--bg); background:var(--ink); color:var(--bg);
-  font-family:"Bagel Fat One","Arial Rounded MT Bold",sans-serif; font-size:clamp(1rem,3.4vw,1.5rem);
-  cursor:pointer; z-index:2; transition:transform .15s ease;
+  width:25%; aspect-ratio:1; border-radius:50%; z-index:2;
+  border:6px solid #FFF6F7; background:#5A3A2E; color:#FFF6F7;
+  box-shadow:0 6px 0 #3F2820, 0 10px 20px rgba(90,58,46,.3);
+  font-family:"Fredoka","Arial Rounded MT Bold",sans-serif; font-weight:600;
+  font-size:clamp(1rem,3.3vw,1.45rem); cursor:pointer;
+  transition:transform .12s ease, box-shadow .12s ease;
 }
-.spin:hover:not(:disabled){transform:translate(-50%,-50%) scale(1.05);}
-.spin:disabled{cursor:default; opacity:.85;}
+.spin:hover:not(:disabled){transform:translate(-50%,-50%) scale(1.04);}
+.spin:active:not(:disabled){transform:translate(-50%,calc(-50% + 4px)); box-shadow:0 2px 0 #3F2820, 0 6px 12px rgba(90,58,46,.3);}
+.spin:disabled{cursor:default; opacity:.9;}
 
-.result{
-  min-height:3.2rem; text-align:center; margin-top:1rem;
-  font-family:"Bagel Fat One","Arial Rounded MT Bold",sans-serif; font-size:clamp(1.4rem,4.5vw,2rem);
+.result{min-height:5.5rem; text-align:center; margin-top:1.25rem;}
+.result small{display:block; color:var(--soft); font-size:.95rem; margin-bottom:.35rem;}
+.winner{
+  display:inline-block; padding:.35rem 1.4rem .45rem; border-radius:999px;
+  font-family:"Fredoka","Arial Rounded MT Bold",sans-serif; font-weight:700;
+  font-size:clamp(1.5rem,5vw,2.2rem); color:#5A3A2E;
+  box-shadow:0 4px 0 rgba(90,58,46,.15);
+  animation:pop .45s cubic-bezier(.3,1.6,.5,1);
 }
-.result small{display:block; font-family:"Figtree",sans-serif; font-size:.95rem; color:var(--soft);}
-.after{display:flex; gap:.5rem; justify-content:center; flex-wrap:wrap; margin-top:.5rem;}
+@keyframes pop{from{transform:scale(.6); opacity:0;} to{transform:scale(1); opacity:1;}}
+.after{display:flex; gap:.5rem; justify-content:center; flex-wrap:wrap; margin-top:.75rem;}
 
-.panel{background:var(--card); border:2px solid var(--line); border-radius:18px; padding:1.25rem;}
-.panel h2{font-size:1.15rem; margin:0 0 .75rem;}
+.panel{background:var(--card); border:2px solid var(--line); border-radius:24px; padding:1.25rem 1.25rem 1rem;}
+.panel h2{font-family:"Fredoka",sans-serif; font-weight:600; font-size:1.25rem; margin:0 0 .75rem;}
 form{display:flex; gap:.5rem;}
 input[type=text]{
-  flex:1; min-width:0; font:inherit; padding:.65rem .8rem; border-radius:10px;
+  flex:1; min-width:0; font:inherit; padding:.65rem .9rem; border-radius:999px;
   border:2px solid var(--line); background:var(--bg); color:var(--ink);
 }
-button{font:inherit; font-weight:600; border-radius:10px; cursor:pointer;}
-.btn{padding:.6rem 1rem; border:2px solid var(--ink); background:var(--ink); color:var(--bg);}
-.btn.ghost{background:transparent; color:var(--ink);}
-.btn.hot{background:var(--accent); border-color:var(--accent); color:var(--accent-ink);}
+button{font:inherit; font-weight:700; cursor:pointer;}
+.btn{padding:.55rem 1.1rem; border-radius:999px; border:2px solid var(--choco); background:var(--choco); color:var(--choco-ink);}
+.btn.ghost{background:transparent; color:var(--ink); border-color:var(--line);}
+.btn.ghost:hover{border-color:var(--accent);}
+.btn.hot{background:var(--accent); border-color:var(--accent); color:#FFFFFF;}
 button:focus-visible,input:focus-visible{outline:3px solid var(--accent); outline-offset:2px;}
 
 ul{list-style:none; padding:0; margin:1rem 0; max-height:340px; overflow-y:auto;}
-li{display:flex; align-items:center; gap:.6rem; padding:.45rem 0; border-bottom:1px solid var(--line);}
+li{display:flex; align-items:center; gap:.65rem; padding:.4rem .25rem; border-bottom:1px dashed var(--line);}
 li:last-child{border-bottom:0;}
-.dot{width:14px; height:14px; border-radius:50%; flex:none;}
+li.is-winner{background:var(--line); border-radius:12px;}
+.dot{width:16px; height:16px; border-radius:50%; flex:none; box-shadow:inset 0 -2px 0 rgba(90,58,46,.15);}
 .label{flex:1; overflow-wrap:anywhere;}
-.del{
-  border:0; background:transparent; color:var(--soft); width:2rem; height:2rem;
-  font-size:1.3rem; line-height:1;
-}
+.del{border:0; background:transparent; color:var(--soft); width:2rem; height:2rem; font-size:1.3rem; line-height:1; border-radius:50%;}
 .del:hover{color:var(--accent);}
 .empty{color:var(--soft); margin:1rem 0;}
 .tools{display:flex; justify-content:space-between; align-items:center; gap:.5rem; flex-wrap:wrap; font-size:.9rem; color:var(--soft);}
 .tools label{display:flex; gap:.4rem; align-items:center; cursor:pointer;}
-.tools .btn{padding:.35rem .7rem; font-size:.9rem;}
-@media (prefers-reduced-motion:reduce){ .spin{transition:none;} }
+.tools .btn{padding:.35rem .8rem; font-size:.9rem;}
+@media (prefers-reduced-motion:reduce){ .spin,.winner{transition:none; animation:none;} }
 </style>
 </head>
 <body>
 <main>
   <h1>Roue du choix</h1>
+  <p class="sub">On mange quoi ce midi ?</p>
   <div class="layout">
     <section>
       <div class="wheel-wrap">
-        <div class="pointer" aria-hidden="true"></div>
+        <div class="pointer" aria-hidden="true">
+          <svg viewBox="0 0 40 52"><path d="M20 50 C12 36 4 28 4 18 A16 16 0 0 1 36 18 C36 28 28 36 20 50Z" fill="#E77F95" stroke="#FFF6F7" stroke-width="3"/><circle cx="20" cy="18" r="6" fill="#FFF6F7"/></svg>
+        </div>
         <canvas id="wheel" aria-label="Roue des choix" role="img"></canvas>
         <button class="spin" id="spin">Tourner</button>
       </div>
@@ -112,7 +124,7 @@ li:last-child{border-bottom:0;}
     </section>
 
     <section class="panel">
-      <h2>Les choix</h2>
+      <h2>Au menu</h2>
       <form id="addForm">
         <input type="text" id="newChoice" placeholder="Ajouter un choix…" maxlength="40" aria-label="Nouveau choix">
         <button class="btn hot" type="submit">Ajouter</button>
@@ -131,15 +143,18 @@ li:last-child{border-bottom:0;}
 
 <script>
 (function(){
-  const COLORS = ["#E4572E","#F2B134","#4F9D69","#3D7EB9","#7B5EA7","#E88AA8","#2BA3A0","#F08A4B"];
+  // Pastels "pâtisserie" : fraise, pistache, citron, myrtille, abricot, lavande, menthe, pêche
+  const COLORS = ["#F7B2BD","#C5E3B5","#FBE7A1","#B8C9F2","#FBC99D","#D9C5F0","#A8E0D2","#F9D0C4"];
+  const TEXT = "#5A3A2E";
   const KEY = "roue-du-choix-v2";
   const DEFAULTS = ["lascappatta", "hokkaido", "vietquan", "franprix", "carrefour", "bigfernand", "707", "himalayan", "boulangerie", "42", "granola", "kapraow", "pokewok", "kebab", "ama", "napoli", "villaalati", "streetpoint", "santarita", "38", "creperie", "mekong", "barsalade", "fireho", "phokitchen", "ramen", "yum", "nouveau", "cantine", "caribeen", "tasty", "tripletta", "bouillon"];
   let choices = load() || DEFAULTS.slice();
-  let rot = 0, spinning = false, lastWinner = -1;
+  let rot = 0, spinning = false, lastWinner = -1, glow = 0, glowAnim = null;
 
   const canvas = document.getElementById("wheel");
   const ctx = canvas.getContext("2d");
   const $ = id => document.getElementById(id);
+  const reduceMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   function load(){ try{ const v = JSON.parse(localStorage.getItem(KEY)); return Array.isArray(v) ? v : null; }catch(e){ return null; } }
   function save(){ try{ localStorage.setItem(KEY, JSON.stringify(choices)); }catch(e){} }
@@ -157,39 +172,73 @@ li:last-child{border-bottom:0;}
     draw();
   }
 
+  function slice(c, r, a0, seg, i, pull, dim){
+    const mid = a0 + seg/2;
+    const ox = Math.cos(mid)*pull, oy = Math.sin(mid)*pull;
+    ctx.save();
+    ctx.translate(ox, oy);
+    ctx.beginPath(); ctx.moveTo(c,c); ctx.arc(c,c,r,a0,a0+seg); ctx.closePath();
+    ctx.fillStyle = color(i); ctx.fill();
+    if (dim){ ctx.fillStyle = "rgba(255,246,247,.6)"; ctx.fill(); }
+    ctx.lineWidth = 2; ctx.strokeStyle = "#FFF6F7"; ctx.stroke();
+    return ctx; // caller restores
+  }
+
+  function label(c, r, a0, seg, i, n, size, bold){
+    ctx.save();
+    ctx.translate(c,c); ctx.rotate(a0 + seg/2);
+    ctx.textAlign = "right"; ctx.textBaseline = "middle";
+    ctx.fillStyle = TEXT;
+    let fs = Math.max(11, Math.min(22, size/(n>24?34:n>12?28:20)));
+    if (bold) fs *= 1.12;
+    ctx.font = `800 ${fs}px Nunito, system-ui, sans-serif`;
+    let t = choices[i], maxW = r*(bold ? 0.68 : 0.58);
+    while (ctx.measureText(t).width > maxW && t.length > 1) t = t.slice(0,-1);
+    if (t !== choices[i]) t = t.slice(0,-1) + "…";
+    ctx.fillText(t, r - (bold ? 34 : 14), 0);
+    ctx.restore();
+  }
+
   function draw(){
     const size = canvas.getBoundingClientRect().width;
-    const c = size/2, r = c - 6;
-    const ink = getComputedStyle(document.documentElement).getPropertyValue("--ink").trim();
+    const c = size/2;
+    const crustR = c - 14;           // bord de tarte
+    const r = crustR - 6;
     ctx.clearRect(0,0,size,size);
     const n = choices.length;
+
+    // Simple anneau autour de la roue
+    ctx.fillStyle = "#E9B872";
+    ctx.beginPath(); ctx.arc(c,c,crustR,0,Math.PI*2); ctx.fill();
+
     if (n === 0){
       ctx.beginPath(); ctx.arc(c,c,r,0,Math.PI*2);
-      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--line").trim(); ctx.fill();
+      ctx.fillStyle = "#FFF6F7"; ctx.fill();
       return;
     }
     const seg = Math.PI*2/n;
-    for (let i=0;i<n;i++){
-      const a0 = rot + i*seg - Math.PI/2;
-      ctx.beginPath(); ctx.moveTo(c,c); ctx.arc(c,c,r,a0,a0+seg); ctx.closePath();
-      ctx.fillStyle = color(i); ctx.fill();
-      ctx.lineWidth = 2; ctx.strokeStyle = "rgba(255,255,255,.7)"; ctx.stroke();
+    const hl = lastWinner >= 0 && !spinning;
 
+    for (let i=0;i<n;i++){
+      if (hl && i === lastWinner) continue;
+      const a0 = rot + i*seg - Math.PI/2;
+      slice(c, r, a0, seg, i, 0, hl); ctx.restore();
+      ctx.save(); ctx.globalAlpha = hl ? 0.4 : 1; label(c, r, a0, seg, i, n, size, false); ctx.restore();
+    }
+
+    if (hl){
+      const i = lastWinner, a0 = rot + i*seg - Math.PI/2, mid = a0 + seg/2;
+      const pull = size*0.018 + glow*size*0.012;
       ctx.save();
-      ctx.translate(c,c); ctx.rotate(a0 + seg/2);
-      ctx.textAlign = "right"; ctx.textBaseline = "middle";
-      ctx.fillStyle = "#FFFFFF";
-      const fs = Math.max(11, Math.min(22, size/(n>24?34:n>12?28:20)));
-      ctx.font = `700 ${fs}px Figtree, system-ui, sans-serif`;
-      let t = choices[i], maxW = r*0.62;
-      while (ctx.measureText(t).width > maxW && t.length > 1) t = t.slice(0,-1);
-      if (t !== choices[i]) t = t.slice(0,-1) + "…";
-      ctx.shadowColor = "rgba(0,0,0,.35)"; ctx.shadowBlur = 3;
-      ctx.fillText(t, r - 16, 0);
+      ctx.shadowColor = "rgba(231,127,149,.9)"; ctx.shadowBlur = 18 + glow*14;
+      slice(c, r + 4, a0, seg, i, pull, false);
+      ctx.lineWidth = 4; ctx.strokeStyle = "#FFFFFF"; ctx.stroke();
+      ctx.restore(); ctx.restore();
+      ctx.save();
+      ctx.translate(Math.cos(mid)*pull, Math.sin(mid)*pull);
+      label(c, r + 4, a0, seg, i, n, size, true);
       ctx.restore();
     }
-    ctx.beginPath(); ctx.arc(c,c,r,0,Math.PI*2);
-    ctx.lineWidth = 6; ctx.strokeStyle = ink; ctx.stroke();
   }
 
   function indexAt(rotation){
@@ -199,26 +248,31 @@ li:last-child{border-bottom:0;}
   }
 
   let audio;
-  function tick(){
+  function tick(freq, dur){
     if (!$("sound").checked) return;
     try{
       audio = audio || new (window.AudioContext || window.webkitAudioContext)();
       const o = audio.createOscillator(), g = audio.createGain();
-      o.frequency.value = 1200; o.type = "square";
-      g.gain.setValueAtTime(.05, audio.currentTime);
-      g.gain.exponentialRampToValueAtTime(.001, audio.currentTime + .04);
-      o.connect(g).connect(audio.destination); o.start(); o.stop(audio.currentTime + .05);
+      o.frequency.value = freq || 900; o.type = "triangle";
+      g.gain.setValueAtTime(.08, audio.currentTime);
+      g.gain.exponentialRampToValueAtTime(.001, audio.currentTime + (dur || .05));
+      o.connect(g).connect(audio.destination); o.start(); o.stop(audio.currentTime + (dur || .05) + .01);
     }catch(e){}
+  }
+
+  function clearWinner(){
+    lastWinner = -1; glow = 0;
+    if (glowAnim) cancelAnimationFrame(glowAnim), glowAnim = null;
+    $("result").innerHTML = ""; $("after").hidden = true;
   }
 
   function spin(){
     if (spinning || choices.length < 2) return;
-    spinning = true; $("spin").disabled = true;
-    $("result").innerHTML = ""; $("after").hidden = true;
-    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    clearWinner();
+    spinning = true; $("spin").disabled = true; render(false);
     const start = rot;
     const delta = Math.PI*2*(5 + Math.random()*3) + Math.random()*Math.PI*2;
-    const dur = reduce ? 800 : 5000 + Math.random()*1200;
+    const dur = reduceMotion() ? 800 : 5000 + Math.random()*1200;
     const t0 = performance.now();
     let lastIdx = indexAt(rot);
     function frame(now){
@@ -238,59 +292,71 @@ li:last-child{border-bottom:0;}
     spinning = false; $("spin").disabled = false;
     rot = rot % (Math.PI*2);
     lastWinner = indexAt(rot);
-    const name = choices[lastWinner];
-    $("result").innerHTML = "";
-    const s = document.createElement("small"); s.textContent = "La roue a choisi";
-    $("result").append(s, document.createTextNode(name));
+    tick(660,.12); setTimeout(()=>tick(990,.18),110);
+
+    const res = $("result"); res.innerHTML = "";
+    const s = document.createElement("small"); s.textContent = "Aujourd'hui, ce sera";
+    const w = document.createElement("span"); w.className = "winner";
+    w.textContent = choices[lastWinner]; w.style.background = color(lastWinner);
+    res.append(s, w);
     $("after").hidden = false;
+    render(false);
+
+    if (reduceMotion()){ glow = .5; draw(); return; }
+    const t0 = performance.now();
+    (function pulse(now){
+      const t = (now - t0)/1000;
+      glow = (Math.sin(t*4) + 1)/2;
+      draw();
+      glowAnim = requestAnimationFrame(pulse);
+    })(t0);
   }
 
-  function render(){
+  function render(redraw = true){
     const ul = $("list"); ul.innerHTML = "";
     choices.forEach((ch,i)=>{
       const li = document.createElement("li");
+      if (i === lastWinner && !spinning) li.className = "is-winner";
       const dot = document.createElement("span"); dot.className = "dot"; dot.style.background = color(i);
       const lab = document.createElement("span"); lab.className = "label"; lab.textContent = ch;
-      const del = document.createElement("button"); del.className = "del"; del.innerHTML = "×";
+      const del = document.createElement("button"); del.className = "del"; del.textContent = "×";
       del.setAttribute("aria-label", "Retirer " + ch);
       del.onclick = () => remove(i);
       li.append(dot, lab, del); ul.append(li);
     });
     $("empty").hidden = choices.length >= 2;
     $("spin").disabled = spinning || choices.length < 2;
-    save(); draw();
+    save(); if (redraw) draw();
   }
 
   function remove(i){
     if (spinning) return;
     choices.splice(i,1);
-    $("after").hidden = true; $("result").innerHTML = ""; lastWinner = -1;
-    render();
+    clearWinner(); render();
   }
 
   $("addForm").addEventListener("submit", e=>{
     e.preventDefault();
     const inp = $("newChoice"), v = inp.value.trim();
     if (!v || spinning) return;
-    choices.push(v); inp.value = ""; inp.focus(); render();
+    choices.push(v); inp.value = ""; inp.focus(); clearWinner(); render();
   });
   $("spin").onclick = spin;
   $("removeWinner").onclick = () => { if (lastWinner >= 0) remove(lastWinner); };
   $("shuffle").onclick = () => {
     if (spinning) return;
     for (let i=choices.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [choices[i],choices[j]] = [choices[j],choices[i]]; }
-    render();
+    clearWinner(); render();
   };
   $("clear").onclick = () => {
     if (spinning || !choices.length) return;
-    if (confirm("Effacer tous les choix ?")){ choices = []; $("result").innerHTML=""; $("after").hidden = true; render(); }
+    if (confirm("Effacer tous les choix ?")){ choices = []; clearWinner(); render(); }
   };
   $("reset").onclick = () => {
     if (spinning) return;
-    if (confirm("Revenir à la liste d'origine ?")){ choices = DEFAULTS.slice(); $("result").innerHTML=""; $("after").hidden = true; lastWinner = -1; render(); }
+    if (confirm("Revenir à la liste d'origine ?")){ choices = DEFAULTS.slice(); clearWinner(); render(); }
   };
   window.addEventListener("resize", resize);
-  matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", draw);
   if (document.fonts) document.fonts.ready.then(draw);
 
   render(); resize();
