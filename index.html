@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Roue du choix</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Figtree:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFF4DE; --ink:#1F3A5F; --soft:#5B6F8A; --card:#FFFFFF; --line:#E9D9B8;
+  --accent:#E4572E; --accent-ink:#FFFFFF;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14263D; --ink:#FFF4DE; --soft:#A9B8CC; --card:#1C3350; --line:#2C4768;
+    --accent:#F2B134; --accent-ink:#14263D;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14263D; --ink:#FFF4DE; --soft:#A9B8CC; --card:#1C3350; --line:#2C4768;
+  --accent:#F2B134; --accent-ink:#14263D;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:1rem; line-height:1.5;
+}
+main{max-width:1000px; margin:0 auto; padding:1.5rem 1rem 3rem;}
+h1{
+  font-family:"Bagel Fat One","Arial Rounded MT Bold","Trebuchet MS",sans-serif;
+  font-weight:400; font-size:clamp(2.2rem,7vw,3.6rem); line-height:1;
+  margin:.5rem 0 1.5rem; text-align:center; letter-spacing:.01em;
+}
+.layout{display:grid; gap:2rem; grid-template-columns:1fr; align-items:start;}
+@media (min-width:820px){ .layout{grid-template-columns:1.3fr 1fr;} }
+
+.wheel-wrap{position:relative; width:100%; max-width:520px; margin:0 auto; aspect-ratio:1;}
+canvas{width:100%; height:100%; display:block;}
+.pointer{
+  position:absolute; top:-6px; left:50%; transform:translateX(-50%);
+  width:0; height:0; border-left:18px solid transparent; border-right:18px solid transparent;
+  border-top:34px solid var(--ink); filter:drop-shadow(0 2px 0 var(--bg)); z-index:2;
+}
+.spin{
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:26%; aspect-ratio:1; border-radius:50%;
+  border:5px solid var(--bg); background:var(--ink); color:var(--bg);
+  font-family:"Bagel Fat One","Arial Rounded MT Bold",sans-serif; font-size:clamp(1rem,3.4vw,1.5rem);
+  cursor:pointer; z-index:2; transition:transform .15s ease;
+}
+.spin:hover:not(:disabled){transform:translate(-50%,-50%) scale(1.05);}
+.spin:disabled{cursor:default; opacity:.85;}
+
+.result{
+  min-height:3.2rem; text-align:center; margin-top:1rem;
+  font-family:"Bagel Fat One","Arial Rounded MT Bold",sans-serif; font-size:clamp(1.4rem,4.5vw,2rem);
+}
+.result small{display:block; font-family:"Figtree",sans-serif; font-size:.95rem; color:var(--soft);}
+.after{display:flex; gap:.5rem; justify-content:center; flex-wrap:wrap; margin-top:.5rem;}
+
+.panel{background:var(--card); border:2px solid var(--line); border-radius:18px; padding:1.25rem;}
+.panel h2{font-size:1.15rem; margin:0 0 .75rem;}
+form{display:flex; gap:.5rem;}
+input[type=text]{
+  flex:1; min-width:0; font:inherit; padding:.65rem .8rem; border-radius:10px;
+  border:2px solid var(--line); background:var(--bg); color:var(--ink);
+}
+button{font:inherit; font-weight:600; border-radius:10px; cursor:pointer;}
+.btn{padding:.6rem 1rem; border:2px solid var(--ink); background:var(--ink); color:var(--bg);}
+.btn.ghost{background:transparent; color:var(--ink);}
+.btn.hot{background:var(--accent); border-color:var(--accent); color:var(--accent-ink);}
+button:focus-visible,input:focus-visible{outline:3px solid var(--accent); outline-offset:2px;}
+
+ul{list-style:none; padding:0; margin:1rem 0; max-height:340px; overflow-y:auto;}
+li{display:flex; align-items:center; gap:.6rem; padding:.45rem 0; border-bottom:1px solid var(--line);}
+li:last-child{border-bottom:0;}
+.dot{width:14px; height:14px; border-radius:50%; flex:none;}
+.label{flex:1; overflow-wrap:anywhere;}
+.del{
+  border:0; background:transparent; color:var(--soft); width:2rem; height:2rem;
+  font-size:1.3rem; line-height:1;
+}
+.del:hover{color:var(--accent);}
+.empty{color:var(--soft); margin:1rem 0;}
+.tools{display:flex; justify-content:space-between; align-items:center; gap:.5rem; flex-wrap:wrap; font-size:.9rem; color:var(--soft);}
+.tools label{display:flex; gap:.4rem; align-items:center; cursor:pointer;}
+.tools .btn{padding:.35rem .7rem; font-size:.9rem;}
+@media (prefers-reduced-motion:reduce){ .spin{transition:none;} }
+</style>
+</head>
+<body>
+<main>
+  <h1>Roue du choix</h1>
+  <div class="layout">
+    <section>
+      <div class="wheel-wrap">
+        <div class="pointer" aria-hidden="true"></div>
+        <canvas id="wheel" aria-label="Roue des choix" role="img"></canvas>
+        <button class="spin" id="spin">Tourner</button>
+      </div>
+      <div class="result" id="result" aria-live="polite"></div>
+      <div class="after" id="after" hidden>
+        <button class="btn ghost" id="removeWinner">Retirer ce choix</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Les choix</h2>
+      <form id="addForm">
+        <input type="text" id="newChoice" placeholder="Ajouter un choix…" maxlength="40" aria-label="Nouveau choix">
+        <button class="btn hot" type="submit">Ajouter</button>
+      </form>
+      <ul id="list"></ul>
+      <p class="empty" id="empty" hidden>Ajoutez au moins deux choix pour faire tourner la roue.</p>
+      <div class="tools">
+        <label><input type="checkbox" id="sound" checked> Son</label>
+        <button class="btn ghost" id="shuffle">Mélanger</button>
+        <button class="btn ghost" id="reset">Liste d'origine</button>
+        <button class="btn ghost" id="clear">Tout effacer</button>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+(function(){
+  const COLORS = ["#E4572E","#F2B134","#4F9D69","#3D7EB9","#7B5EA7","#E88AA8","#2BA3A0","#F08A4B"];
+  const KEY = "roue-du-choix-v2";
+  const DEFAULTS = ["lascappatta", "hokkaido", "vietquan", "franprix", "carrefour", "bigfernand", "707", "himalayan", "boulangerie", "42", "granola", "kapraow", "pokewok", "kebab", "ama", "napoli", "villaalati", "streetpoint", "santarita", "38", "creperie", "mekong", "barsalade", "fireho", "phokitchen", "ramen", "yum", "nouveau", "cantine", "caribeen", "tasty", "tripletta", "bouillon"];
+  let choices = load() || DEFAULTS.slice();
+  let rot = 0, spinning = false, lastWinner = -1;
+
+  const canvas = document.getElementById("wheel");
+  const ctx = canvas.getContext("2d");
+  const $ = id => document.getElementById(id);
+
+  function load(){ try{ const v = JSON.parse(localStorage.getItem(KEY)); return Array.isArray(v) ? v : null; }catch(e){ return null; } }
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(choices)); }catch(e){} }
+  function color(i){
+    let c = COLORS[i % COLORS.length];
+    if (choices.length > 1 && i === choices.length - 1 && i % COLORS.length === 0) c = COLORS[2];
+    return c;
+  }
+
+  function resize(){
+    const size = canvas.getBoundingClientRect().width;
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = size * dpr; canvas.height = size * dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    draw();
+  }
+
+  function draw(){
+    const size = canvas.getBoundingClientRect().width;
+    const c = size/2, r = c - 6;
+    const ink = getComputedStyle(document.documentElement).getPropertyValue("--ink").trim();
+    ctx.clearRect(0,0,size,size);
+    const n = choices.length;
+    if (n === 0){
+      ctx.beginPath(); ctx.arc(c,c,r,0,Math.PI*2);
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue("--line").trim(); ctx.fill();
+      return;
+    }
+    const seg = Math.PI*2/n;
+    for (let i=0;i<n;i++){
+      const a0 = rot + i*seg - Math.PI/2;
+      ctx.beginPath(); ctx.moveTo(c,c); ctx.arc(c,c,r,a0,a0+seg); ctx.closePath();
+      ctx.fillStyle = color(i); ctx.fill();
+      ctx.lineWidth = 2; ctx.strokeStyle = "rgba(255,255,255,.7)"; ctx.stroke();
+
+      ctx.save();
+      ctx.translate(c,c); ctx.rotate(a0 + seg/2);
+      ctx.textAlign = "right"; ctx.textBaseline = "middle";
+      ctx.fillStyle = "#FFFFFF";
+      const fs = Math.max(11, Math.min(22, size/(n>24?34:n>12?28:20)));
+      ctx.font = `700 ${fs}px Figtree, system-ui, sans-serif`;
+      let t = choices[i], maxW = r*0.62;
+      while (ctx.measureText(t).width > maxW && t.length > 1) t = t.slice(0,-1);
+      if (t !== choices[i]) t = t.slice(0,-1) + "…";
+      ctx.shadowColor = "rgba(0,0,0,.35)"; ctx.shadowBlur = 3;
+      ctx.fillText(t, r - 16, 0);
+      ctx.restore();
+    }
+    ctx.beginPath(); ctx.arc(c,c,r,0,Math.PI*2);
+    ctx.lineWidth = 6; ctx.strokeStyle = ink; ctx.stroke();
+  }
+
+  function indexAt(rotation){
+    const n = choices.length, seg = Math.PI*2/n;
+    const a = ((-rotation) % (Math.PI*2) + Math.PI*2) % (Math.PI*2);
+    return Math.floor(a/seg) % n;
+  }
+
+  let audio;
+  function tick(){
+    if (!$("sound").checked) return;
+    try{
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      const o = audio.createOscillator(), g = audio.createGain();
+      o.frequency.value = 1200; o.type = "square";
+      g.gain.setValueAtTime(.05, audio.currentTime);
+      g.gain.exponentialRampToValueAtTime(.001, audio.currentTime + .04);
+      o.connect(g).connect(audio.destination); o.start(); o.stop(audio.currentTime + .05);
+    }catch(e){}
+  }
+
+  function spin(){
+    if (spinning || choices.length < 2) return;
+    spinning = true; $("spin").disabled = true;
+    $("result").innerHTML = ""; $("after").hidden = true;
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const start = rot;
+    const delta = Math.PI*2*(5 + Math.random()*3) + Math.random()*Math.PI*2;
+    const dur = reduce ? 800 : 5000 + Math.random()*1200;
+    const t0 = performance.now();
+    let lastIdx = indexAt(rot);
+    function frame(now){
+      const p = Math.min(1, (now - t0)/dur);
+      const e = 1 - Math.pow(1 - p, 4);
+      rot = start + delta*e;
+      draw();
+      const idx = indexAt(rot);
+      if (idx !== lastIdx){ tick(); lastIdx = idx; }
+      if (p < 1) requestAnimationFrame(frame);
+      else finish();
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function finish(){
+    spinning = false; $("spin").disabled = false;
+    rot = rot % (Math.PI*2);
+    lastWinner = indexAt(rot);
+    const name = choices[lastWinner];
+    $("result").innerHTML = "";
+    const s = document.createElement("small"); s.textContent = "La roue a choisi";
+    $("result").append(s, document.createTextNode(name));
+    $("after").hidden = false;
+  }
+
+  function render(){
+    const ul = $("list"); ul.innerHTML = "";
+    choices.forEach((ch,i)=>{
+      const li = document.createElement("li");
+      const dot = document.createElement("span"); dot.className = "dot"; dot.style.background = color(i);
+      const lab = document.createElement("span"); lab.className = "label"; lab.textContent = ch;
+      const del = document.createElement("button"); del.className = "del"; del.innerHTML = "×";
+      del.setAttribute("aria-label", "Retirer " + ch);
+      del.onclick = () => remove(i);
+      li.append(dot, lab, del); ul.append(li);
+    });
+    $("empty").hidden = choices.length >= 2;
+    $("spin").disabled = spinning || choices.length < 2;
+    save(); draw();
+  }
+
+  function remove(i){
+    if (spinning) return;
+    choices.splice(i,1);
+    $("after").hidden = true; $("result").innerHTML = ""; lastWinner = -1;
+    render();
+  }
+
+  $("addForm").addEventListener("submit", e=>{
+    e.preventDefault();
+    const inp = $("newChoice"), v = inp.value.trim();
+    if (!v || spinning) return;
+    choices.push(v); inp.value = ""; inp.focus(); render();
+  });
+  $("spin").onclick = spin;
+  $("removeWinner").onclick = () => { if (lastWinner >= 0) remove(lastWinner); };
+  $("shuffle").onclick = () => {
+    if (spinning) return;
+    for (let i=choices.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [choices[i],choices[j]] = [choices[j],choices[i]]; }
+    render();
+  };
+  $("clear").onclick = () => {
+    if (spinning || !choices.length) return;
+    if (confirm("Effacer tous les choix ?")){ choices = []; $("result").innerHTML=""; $("after").hidden = true; render(); }
+  };
+  $("reset").onclick = () => {
+    if (spinning) return;
+    if (confirm("Revenir à la liste d'origine ?")){ choices = DEFAULTS.slice(); $("result").innerHTML=""; $("after").hidden = true; lastWinner = -1; render(); }
+  };
+  window.addEventListener("resize", resize);
+  matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", draw);
+  if (document.fonts) document.fonts.ready.then(draw);
+
+  render(); resize();
+})();
+</script>
+</body>
+</html>
